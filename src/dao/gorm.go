@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-var DB *gorm.DB
+var _db *gorm.DB
 
 func init() {
 	//配置mysql连接参数
@@ -17,12 +17,23 @@ func init() {
 	port := 3306
 	Dbname := "gorm"
 	dnt := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local", username, passwrod, host, port, Dbname)
-
-	if db, err := gorm.Open(mysql.Open(dnt), &gorm.Config{
+	var err error
+	_db, err = gorm.Open(mysql.Open(dnt), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
-	}); err != nil {
+	})
+	if err != nil {
 		fmt.Println("mysql  connected err：", err)
 	} else {
-		DB = db
+		db, err := _db.DB()
+		if err != nil {
+			fmt.Println("mysql  connected err：", err)
+		}
+		db.SetMaxOpenConns(100)
+		db.SetMaxIdleConns(20)
 	}
+
+}
+
+func GetDB() *gorm.DB {
+	return _db
 }

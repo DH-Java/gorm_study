@@ -22,7 +22,8 @@ func InsertUser(context *gin.Context) {
 
 func SelectUserById(context *gin.Context) {
 	param := context.Query("id")
-	user := dao.SelectById(strconv.ParseInt(param, 10, 64))
+	id, _ := strconv.ParseInt(param, 10, 64)
+	user := dao.SelectById(id)
 	context.JSON(http.StatusOK, gin.H{"data": gin.H{"data": user}})
 }
 
